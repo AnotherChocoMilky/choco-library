@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🍫 Choco Library</title>
+<style>
+:root {
+  --bg-color:#0a0a0a;--accent:#8e6fff;--text:#fff;--muted:#aaa;
+  --border:rgba(255,255,255,.08);--radius:18px;--shadow:0 4px 30px rgba(0,0,0,.2);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg-color);color:var(--text);font-family:"SF Pro Display",-apple-system,BlinkMacSystemFont,sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+header{position:sticky;top:0;width:100%;background:rgba(20,20,20,.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:20px;text-align:center;z-index:10;}
+header h1{margin:0;color:var(--accent);font-weight:600;font-size:1.8em;}
+#search{margin-top:10px;padding:10px 16px;width:80%;max-width:500px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.06);color:var(--text);font-size:16px;outline:none;transition:.2s;}
+#search:focus{border-color:var(--accent);}
+.segmented{display:flex;justify-content:center;background:rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;margin-top:16px;border:1px solid var(--border);width:fit-content;margin-inline:auto;}
+.segmented button{flex:1;padding:10px 20px;background:transparent;border:none;color:var(--text);font-weight:500;cursor:pointer;transition:.3s;}
+.segmented button.active{background:var(--accent);}
+#repoInput{width:70%;max-width:500px;padding:10px 16px;border-radius:var(--radius);border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);margin:20px 0 10px;font-size:15px;outline:none;transition:.2s;}
+#repoInput:focus{border-color:var(--accent);}
+.add-btn{background:var(--accent);border:none;color:white;padding:10px 18px;border-radius:var(--radius);cursor:pointer;font-weight:600;transition:.25s;box-shadow:var(--shadow);margin-bottom:20px;}
+.add-btn:hover{opacity:.9;transform:translateY(-2px);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px;width:90%;max-width:1200px;padding:40px 0;}
+.card{background:rgba(255,255,255,.05);border-radius:var(--radius);border:1px solid var(--border);backdrop-filter:blur(12px);padding:20px;text-align:center;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);animation:fadeIn .4s forwards;}
+@keyframes fadeIn{to{opacity:1;transform:translateY(0);}}
+.card img{width:90px;height:90px;border-radius:20px;object-fit:cover;margin-bottom:15px;}
+.card h3{margin:10px 0 5px;font-size:1.2em;}
+.card p{margin:5px 0;color:var(--muted);font-size:.9em;}
+.download-btn{margin-top:12px;background:linear-gradient(90deg,var(--accent),#6e8bff);color:white;font-size:.95em;padding:8px 16px;border-radius:var(--radius);text-decoration:none;display:inline-block;transition:.25s;}
+.download-btn:hover{opacity:.9;transform:translateY(-2px);}
+footer{color:var(--muted);font-size:.8em;padding:20px;text-align:center;border-top:1px solid var(--border);width:100%;margin-top:auto;}
+</style>
+</head>
+<body>
+<header>
+<h1>🍫 Choco Library</h1>
+<input type="text" id="search" placeholder="Search apps...">
+<div class="segmented">
+<button id="defaultTab" class="active" onclick="switchTab('default')">Choco Library (<span id="defaultCount">0</span>)</button>
+<button id="userTab" onclick="switchTab('user')">User Repos (<span id="userCount">0</span>)</button>
+</div>
+</header>
+<main>
+<input id="repoInput" placeholder="Add custom repo URL..." />
+<button class="add-btn" onclick="addRepo()">➕ Add Repo</button>
+<section id="apps" class="grid"></section>
+</main>
+<footer>
+<p>Choco Library does not host or distribute IPA files. All content is fetched directly from public sources.</p>
+</footer>
+<script>
+const defaultRepos=[ "https://raw.githubusercontent.com/swaggyP36000/TrollStore-IPAs/refs/heads/main/apps.json","https://raw.githubusercontent.com/WhySooooFurious/Ultimate-Sideloading-Guide/refs/heads/main/raw-files/app-repo.json","https://esign.yyyue.xyz/app.json","https://raw.githubusercontent.com/vizunchik/AltStoreRus/master/apps.json","https://qnblackcat.github.io/AltStore/apps.json","https://randomblock1.com/altstore/apps.json","https://wuxu1.github.io/wuxu-complete-plus.json","https://wuxu1.github.io/wuxu-complete.json","https://ipa.cypwn.xyz/cypwn.json","https://driftywinds.github.io/AltStore/apps.json","https://hann8n.github.io/JackCracks/MovieboxPro.json","https://raw.githubusercontent.com/TheNightmanCodeth/chromium-ios/master/altstore-source.json","https://repository.apptesters.org/","https://aio.yippee.rip/repo.json","https://community-apps.sidestore.io/sidecommunity.json","https://raw.githubusercontent.com/arichornloverALT/arichornloveralt.github.io/main/apps2.json","https://raw.githubusercontent.com/arichornloveralt/arichornloveralt.github.io/main/apps.json","https://raw.githubusercontent.com/lo-cafe/winston-altstore/main/apps.json","https://qingsongqian.github.io/all.html","https://tiny.one/SpotC","https://theodyssey.dev/altstore/odysseysource.json","https://provenance-emu.com/apps.json","https://ish.app/altstore.json","https://raw.githubusercontent.com/Balackburn/YTLitePlusAltstore/main/apps.json","https://raw.githubusercontent.com/whoeevee/EeveeSpotify/swift/repo.json","https://altstore.oatmealdome.me/","https://raw.githubusercontent.com/driftywinds/driftywinds.github.io/master/AltStore/apps.json","https://alts.lao.sb/","https://xitrix.github.io/iTorrent/AltStore.json","https://driftywinds.github.io/repos/esign.json","https://github.com/khcrysalis/Feather/raw/main/app-repo.json","https://apps.nabzclan.vip/repos/altstore.php","https://flyinghead.github.io/flycast-builds/altstore.json","https://alt.crystall1ne.dev/","https://apps.sidestore.io/","https://repos.yattee.stream/alt/apps.json","https://alt.thatstel.la/" ];
+let userRepos=JSON.parse(localStorage.getItem("userRepos")||"[]");
+let currentTab="default";let allApps=[];
+async function fetchRepo(u){try{const r=await fetch(`/api/fetch?url=${encodeURIComponent(u)}`);return await r.json()}catch{return[]}}
+async function loadRepos(tab="default"){const repos=tab==="default"?defaultRepos:userRepos;document.getElementById(tab+"Count").innerText=repos.length;const res=await Promise.all(repos.map(fetchRepo));allApps=res.flat();renderApps(allApps);}
+function renderApps(apps){const g=document.getElementById("apps");g.innerHTML="";if(apps.length===0){g.innerHTML="<p style='color:#aaa;text-align:center;width:100%;'>No apps found.</p>";return;}
+apps.forEach((a,i)=>{const c=document.createElement("div");c.className="card";c.style.animationDelay=(i*40)+"ms";c.innerHTML=`<img src="${a.iconURL||''}" alt=""><h3>${a.name}</h3><p>${a.description}</p><p>Version: ${a.version}</p><p>${a.date?`Updated: ${a.date}`:''}</p><a class='download-btn' href='${a.downloadURL}' target='_blank'>⬇️ Download</a>`;g.appendChild(c);});}
+function addRepo(){const input=document.getElementById("repoInput");const url=input.value.trim();if(!url)return;userRepos.push(url);localStorage.setItem("userRepos",JSON.stringify(userRepos));input.value="";document.getElementById("userCount").innerText=userRepos.length;if(currentTab==="user")loadRepos("user");}
+function switchTab(tab){currentTab=tab;document.getElementById("defaultTab").classList.toggle("active",tab==="default");document.getElementById("userTab").classList.toggle("active",tab==="user");loadRepos(tab);}
+document.getElementById("search").addEventListener("input",e=>{const term=e.target.value.toLowerCase();const f=allApps.filter(a=>a.name.toLowerCase().includes(term)||a.description.toLowerCase().includes(term));renderApps(f);});
+loadRepos();
+</script>
+</body>
+</html>
